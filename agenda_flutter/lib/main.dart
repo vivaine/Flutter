@@ -1,4 +1,5 @@
 import 'package:agenda_flutter/contactCard.dart';
+import 'package:agenda_flutter/repository/ScheduleRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:agenda_flutter/contactViewPage.dart';
@@ -40,18 +41,25 @@ class ScheduleHomePage extends StatefulWidget {
 }
 
 class _ScheduleHomePage extends State<ScheduleHomePage> {
-  void _openViewContact(Contact contact, int index) async {
+  _openEditContact(BuildContext context, Contact contact) async {
     final resultContact = await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ContactViewPage(
-                new Contact(contact.name, contact.phoneNumber, contact.id),
-                1)));
+            builder: (context) => ContactEditingPage(contact, 1)));
+    if (resultContact != null) {
+      contact.name = resultContact.name;
+      contact.phoneNumber = resultContact.phoneNumber;
+    }
+    setState(() {});
+  }
+
+  void _openViewContact(Contact contact, int index) async {
+    final resultContact = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ContactViewPage(contact, 1)));
     if (resultContact != null) {
       _contacts[index].name = resultContact.name;
       _contacts[index].phoneNumber = resultContact.phoneNumber;
-    } else {
-      _contacts.removeAt(index);
+      ScheduleRepository.update(resultContact);
     }
     setState(() {});
   }
@@ -61,7 +69,22 @@ class _ScheduleHomePage extends State<ScheduleHomePage> {
         MaterialPageRoute(builder: (context) => ContactEditingPage(null, 0)));
     if (resultContact != null) {
       _contacts.add(resultContact);
+      ScheduleRepository.save(resultContact);
       setState(() {});
+    }
+  }
+
+  _treatDismiss(DismissDirection direction, Contact contact) {
+    if (direction == DismissDirection.startToEnd) {
+      setState(() {
+        // _openEditContact(context, _contacts[index]);
+      });
+    } else if (direction == DismissDirection.endToStart) {
+      setState(() {
+        ScheduleRepository.delete(contact);
+      });
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text("Contato apagado")));
     }
   }
 
@@ -71,43 +94,59 @@ class _ScheduleHomePage extends State<ScheduleHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: _contacts.length,
-        itemBuilder: (context, index) {
-          final Contact item = _contacts[index];
-          return Dismissible(
-            key: Key(item.name),
-            child: InkWell(
-                onTap: () {
-                  _openViewContact(_contacts[index], index);
-                },
-                child: new Card(
-                    child: ContactCard(new Contact(
-                        _contacts[index].name, _contacts[index].phoneNumber)))),
-            onDismissed: (direction) {
-              setState(() {
-                _contacts.removeAt(index);
-              });
-              Scaffold.of(context)
-                  .showSnackBar(SnackBar(content: Text("Contato apagado")));
-            },
-            background: Container(color: Colors.blue[300]),
-            secondaryBackground: Container(
-              color: Colors.red,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Icon(Icons.delete, color: Colors.white),
-                    Text('Apagar', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
-            ),
-          );
+      body: Container(
+          child: FutureBuilder(
+        future: ScheduleRepository.list(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Erro: ${snapshot.error}');
+          } else if (!snapshot.hasData) {
+            return Center(child: Text('Lista vazia'));
+          } else {
+            return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  Contact item = snapshot.data[index];
+                  return Dismissible(
+                    key: Key(item.id.toString()),
+                    child: InkWell(
+                        onTap: () {
+                          _openViewContact(item, index);
+                        },
+                        child: new Card(child: ContactCard(item))),
+                    onDismissed: (direction) {
+                      _treatDismiss(direction, item);
+                    },
+                    background: Container(
+                        color: Colors.blue[300],
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.edit, color: Colors.white),
+                                Text('Editar',
+                                    style: TextStyle(color: Colors.white))
+                              ]),
+                        )),
+                    secondaryBackground: Container(
+                        color: Colors.red,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(Icons.delete, color: Colors.white),
+                              Text('Apagar',
+                                  style: TextStyle(color: Colors.white)),
+                            ],
+                          ),
+                        )),
+                  );
+                });
+          }
         },
-      ),
+      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _openAddContact(context);

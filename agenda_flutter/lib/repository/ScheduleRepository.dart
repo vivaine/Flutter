@@ -30,5 +30,36 @@ class ScheduleRepository {
     };
 
     int id = await db.insert("contacts", mapContact);
+    print("salvou $id");
+  }
+
+  static Future list() async {
+    Database db = await _dataBaseManager();
+    List rows = await db.rawQuery("select * from contacts");
+
+    var _items = new List();
+    for (var item in rows) {
+      _items.add(new Contact(item['name'], item['phoneNumber'], item['id']));
+    }
+
+    return _items;
+  }
+
+  static update(Contact contact) async {
+    Database db = await _dataBaseManager();
+
+    Map<String, dynamic> mapContact = {
+      "name": contact.name,
+      "phoneNumber": contact.phoneNumber
+    };
+
+    int id = await db.update("contacts", mapContact);
+  }
+
+  static delete(Contact contact) async {
+    Database db = await _dataBaseManager();
+
+    int id =
+        await db.delete("contacts", where: ' id = ?', whereArgs: [contact.id]);
   }
 }

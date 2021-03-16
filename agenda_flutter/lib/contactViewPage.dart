@@ -1,4 +1,5 @@
 import 'package:agenda_flutter/components/contact.dart';
+import 'package:agenda_flutter/repository/ScheduleRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:agenda_flutter/contactEditingPage.dart';
 
@@ -25,6 +26,7 @@ class _ContactViewPage extends State<ContactViewPage> {
     if (resultContact != null) {
       contact.name = resultContact.name;
       contact.phoneNumber = resultContact.phoneNumber;
+      ScheduleRepository.update(resultContact);
     }
     setState(() {});
   }
@@ -39,8 +41,7 @@ class _ContactViewPage extends State<ContactViewPage> {
             return IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Navigator.pop(context,
-                    new Contact(contact.name, contact.phoneNumber, contact.id));
+                Navigator.pop(context, contact);
               },
             );
           },
