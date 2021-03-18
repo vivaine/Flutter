@@ -5,9 +5,8 @@ import 'package:agenda_flutter/contactEditingPage.dart';
 
 class ContactViewPage extends StatefulWidget {
   final Contact contact;
-  final int mode;
 
-  ContactViewPage(this.contact, this.mode);
+  ContactViewPage(this.contact);
 
   @override
   _ContactViewPage createState() => _ContactViewPage(this.contact);
@@ -15,6 +14,7 @@ class ContactViewPage extends StatefulWidget {
 
 class _ContactViewPage extends State<ContactViewPage> {
   final Contact contact;
+  bool changed = false;
 
   _ContactViewPage(this.contact);
 
@@ -24,11 +24,19 @@ class _ContactViewPage extends State<ContactViewPage> {
         MaterialPageRoute(
             builder: (context) => ContactEditingPage(contact, 1)));
     if (resultContact != null) {
+      changed = true;
       contact.name = resultContact.name;
       contact.phoneNumber = resultContact.phoneNumber;
-      ScheduleRepository.update(resultContact);
     }
     setState(() {});
+  }
+
+  _treatBackButton(BuildContext context) {
+    if (changed) {
+      Navigator.pop(context, contact);
+    } else {
+      Navigator.pop(context, null);
+    }
   }
 
   @override
@@ -40,9 +48,7 @@ class _ContactViewPage extends State<ContactViewPage> {
           builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context, contact);
-              },
+              onPressed: () => _treatBackButton(context),
             );
           },
         ),

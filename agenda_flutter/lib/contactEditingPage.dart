@@ -1,4 +1,5 @@
 import 'package:agenda_flutter/components/contact.dart';
+import 'package:agenda_flutter/repository/ScheduleRepository.dart';
 import 'package:flutter/material.dart';
 
 class ContactEditingPage extends StatelessWidget {
@@ -19,6 +20,17 @@ class ContactEditingPage extends StatelessWidget {
         id = contact.id;
       }
     }
+  }
+
+  void _save(BuildContext context) {
+    final contact =
+        Contact(nameController.text, int.parse(phoneController.text), id);
+    if (mode == 0) {
+      ScheduleRepository.insert(contact);
+    } else {
+      ScheduleRepository.update(contact);
+    }
+    Navigator.pop(context, contact);
   }
 
   @override
@@ -62,12 +74,7 @@ class ContactEditingPage extends StatelessWidget {
                     child: MaterialButton(
                       minWidth: MediaQuery.of(context).size.width,
                       padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      onPressed: () {
-                        Navigator.pop(
-                            context,
-                            new Contact(nameController.text,
-                                int.parse(phoneController.text), id));
-                      },
+                      onPressed: () => _save(context),
                       child: Text("Salvar",
                           textAlign: TextAlign.center,
                           style: style.copyWith(

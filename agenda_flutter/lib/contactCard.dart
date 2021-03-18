@@ -8,15 +8,16 @@ class ContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.all(10),
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            Text(this.contact.name,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-            Text(this.contact.phoneNumber.toString())
-          ],
+    return ListTile(
+        leading: Icon(Icons.person, size: 50),
+        title: Text(this.contact.name,
+            style: TextStyle(
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.normal,
+                fontSize: 25)),
+        subtitle: Text(
+          this.contact.phoneNumber.toString(),
+          style: TextStyle(fontFamily: 'Roboto', fontSize: 16),
         ));
   }
 }

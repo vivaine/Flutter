@@ -22,7 +22,7 @@ class ScheduleRepository {
     return database;
   }
 
-  static save(Contact contact) async {
+  static insert(Contact contact) async {
     Database db = await _dataBaseManager();
     Map<String, dynamic> mapContact = {
       "name": contact.name,
@@ -53,7 +53,8 @@ class ScheduleRepository {
       "phoneNumber": contact.phoneNumber
     };
 
-    int id = await db.update("contacts", mapContact);
+    int id = await db.update("contacts", mapContact,
+        where: 'id = ?', whereArgs: [contact.id]);
   }
 
   static delete(Contact contact) async {
