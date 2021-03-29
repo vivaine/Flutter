@@ -59,5 +59,13 @@ class PlacarRepository {
       "resultado1": resultado.resultado1,
       "resultado2": resultado.resultado2
     };
+
+    bd.update("jogos", dadosResultado,
+        where: "id = ?", whereArgs: [resultado.id]);
+  }
+
+  static delete(int resultadoId) async {
+    Database db = await _dataBaseManager();
+    return await db.delete('jogos', where: 'id = ?', whereArgs: [resultadoId]);
   }
 }

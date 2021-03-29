@@ -35,15 +35,15 @@ class ScheduleHomePage extends StatefulWidget {
 }
 
 class _ScheduleHomePage extends State<ScheduleHomePage> {
-  _openEditContact(BuildContext context, Contact contact) async {
-    final resultContact = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ContactEditingPage(contact, 1)));
-    if (resultContact != null) {
-      setState(() {});
-    }
-  }
+  // _openEditContact(BuildContext context, Contact contact) async {
+  //   final resultContact = await Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //           builder: (context) => ContactEditingPage(contact, 1)));
+  //   if (resultContact != null) {
+  //     setState(() {});
+  //   }
+  // }
 
   void _openViewContact(Contact contact, int index) async {
     final resultContact = await Navigator.push(context,

@@ -191,12 +191,5 @@ class CadastroView extends StatelessWidget {
             ],
           ),
         ));
-
-    // Passo 1: Capturar os dados digitados nos campos
-    // Passo 2: Inclurir um novo objeto na Lista
-    // Passo 3: Voltar para a lista
-    //  Navigator.of(context).pop();
-    // Passo 4: ao retornar a lista, atualizar o estado do componente
-    // setState(() {});
   }
 }
